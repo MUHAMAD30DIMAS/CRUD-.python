@@ -87,7 +87,7 @@ def tampilkan_detail_karyawan(k):
     ]], headers=["ID", "Nama", "Posisi", "Gaji", "Kehadiran", "Nilai Kinerja"], tablefmt="grid"))
 
     # Riwayat Kehadiran
-    print("\n📅 Riwayat Kehadiran Terakhir:")
+    print("\n Riwayat Kehadiran Terakhir:")
     if k['riwayat_kehadiran']:
         print(tabulate(
             [[r['tanggal'], r['status']] for r in k['riwayat_kehadiran'][-3:]],# mengambil 3 terbaru riwayat kehadiran
@@ -97,7 +97,7 @@ def tampilkan_detail_karyawan(k):
         print("Belum ada data kehadiran.")
 
     # Proyek
-    print("\n📌 Proyek yang Diikuti:")
+    print("\n Proyek yang Diikuti:")
     if k['proyek']:
         print(tabulate(
             [[p['nama'], p['peran']] for p in k['proyek']],
@@ -238,7 +238,7 @@ def menu():
         elif pilih == '4':
             cari_data()
         elif pilih == '5':
-            print("👋 Keluar dari program.")
+            print(" Keluar dari program.")
             break
         else:
             print("Pilihan tidak valid.")
