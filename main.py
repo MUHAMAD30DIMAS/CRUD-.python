@@ -1,248 +1,264 @@
 from tabulate import tabulate
 from datetime import datetime
 
-# Data awal
-data_karyawan = [
+# Initial employee data
+employee_data = [
     {
         "id": "1",
-        "nama": "Kesuma",
-        "posisi": "General Manager",
-        "gaji": 10000000,
-        "kehadiran": None,
-        "proyek": [],
-        "riwayat_kehadiran": [],
-        "nilai_kinerja": None
+        "name": "Kesuma",
+        "position": "General Manager",
+        "salary": 10000000,
+        "attendance": None,
+        "projects": [],
+        "attendance_history": [],
+        "performance_grade": None
     },
     {
         "id": "2",
-        "nama": "Tengil",
-        "posisi": "Assistent Manager",
-        "gaji": 5000000,
-        "kehadiran": None,
-        "proyek": [],
-        "riwayat_kehadiran": [],
-        "nilai_kinerja": None
+        "name": "Tengil",
+        "position": "Assistant Manager",
+        "salary": 5000000,
+        "attendance": None,
+        "projects": [],
+        "attendance_history": [],
+        "performance_grade": None
     },
     {
         "id": "3",
-        "nama": "Abdul",
-        "posisi": "Project Manager",
-        "gaji": 5000000,
-        "kehadiran": None,
-        "proyek": [],
-        "riwayat_kehadiran": [],
-        "nilai_kinerja": None
+        "name": "Abdul",
+        "position": "Project Manager",
+        "salary": 5000000,
+        "attendance": None,
+        "projects": [],
+        "attendance_history": [],
+        "performance_grade": None
     }
 ]
 
-# Konversi nilai ke presentase kenaikan/penurunan gaji
-def nilai_ke_gaji(nilai):
-    if nilai == 'A': 
+def grade_to_salary_adjustment(grade):
+    """
+    Convert performance grade to percentage adjustment in salary.
+    """
+    if grade == 'A': 
         return 0.10
-    elif nilai == 'B':
+    elif grade == 'B':
         return 0.05
-    elif nilai == 'C':
+    elif grade == 'C':
         return 0
-    elif nilai == 'D':
+    elif grade == 'D':
         return -0.05
-    elif nilai == 'E':
+    elif grade == 'E':
         return -0.10
     return None
 
-# Tambah karyawan baru
-def create_karyawan():
+def create_employee():
+    """
+    Create a new employee and add to employee_data.
+    """
     while True:
-        id_ = input("\nMasukkan ID : ")
-        if any(k['id'] == id_ for k in data_karyawan):
-            print("ID Sudah Ada, Masukkan Dengan ID Yang Lain.")
+        id_ = input("\nEnter Employee ID: ")
+        if any(e['id'] == id_ for e in employee_data):
+            print("ID already exists. Please enter a different ID.")
             continue
         break
-    nama = input("Nama: ").title().strip()
-    posisi = input("Posisi: ").title().strip()
+    name = input("Name: ").title().strip()
+    position = input("Position: ").title().strip()
     while True:
         try:
-            gaji = int(input("Gaji: "))
+            salary = int(input("Salary: "))
             break
         except:
-            print("Gaji Harus Berupa Format Angka!")
-    karyawan = {
+            print("Salary must be a number!")
+    employee = {
         "id": id_,
-        "nama": nama,
-        "posisi": posisi,
-        "gaji": gaji,
-        "kehadiran": None,
-        "proyek": [],
-        "riwayat_kehadiran": [],
-        "nilai_kinerja": None
+        "name": name,
+        "position": position,
+        "salary": salary,
+        "attendance": None,
+        "projects": [],
+        "attendance_history": [],
+        "performance_grade": None
     }
-    data_karyawan.append(karyawan)
-    print("\n✅ Karyawan berhasil ditambahkan.")
+    employee_data.append(employee)
+    print("\n✅ Employee successfully added.")
 
-# Tampilkan karyawan + proyek + kehadiran
-def tampilkan_detail_karyawan(k):
+def show_employee_details(e):
+    """
+    Show full details, attendance, and projects for a single employee.
+    """
     print("\n" + "="*50)
-    print(f" DATA KARYAWAN: {k['nama'].upper()} (ID: {k['id']})")
+    print(f" EMPLOYEE DATA: {e['name'].upper()} (ID: {e['id']})")
     print(tabulate([[
-        k['id'], k['nama'], k['posisi'], f"Rp{k['gaji']:,}", k['kehadiran'] or '-', k['nilai_kinerja'] or '-'
-    ]], headers=["ID", "Nama", "Posisi", "Gaji", "Kehadiran", "Nilai Kinerja"], tablefmt="grid"))
+        e['id'], e['name'], e['position'], f"Rp{e['salary']:,}", e['attendance'] or '-', e['performance_grade'] or '-'
+    ]], headers=["ID", "Name", "Position", "Salary", "Attendance", "Performance Grade"], tablefmt="grid"))
 
-    # Riwayat Kehadiran
-    print("\n Riwayat Kehadiran Terakhir:")
-    if k['riwayat_kehadiran']:
+    # Attendance History
+    print("\n Recent Attendance History:")
+    if e['attendance_history']:
         print(tabulate(
-            [[r['tanggal'], r['status']] for r in k['riwayat_kehadiran'][-3:]],# mengambil 3 terbaru riwayat kehadiran
-            headers=["Tanggal", "Status"], tablefmt="fancy_grid"
+            [[r['date'], r['status']] for r in e['attendance_history'][-3:]],
+            headers=["Date", "Status"], tablefmt="fancy_grid"
         ))
     else:
-        print("Belum ada data kehadiran.")
+        print("No attendance data yet.")
 
-    # Proyek
-    print("\n Proyek yang Diikuti:")
-    if k['proyek']:
+    # Projects
+    print("\n Projects Participated:")
+    if e['projects']:
         print(tabulate(
-            [[p['nama'], p['peran']] for p in k['proyek']],
-            headers=["Nama Proyek", "Peran"], tablefmt="fancy_grid"
+            [[p['name'], p['role']] for p in e['projects']],
+            headers=["Project Name", "Role"], tablefmt="fancy_grid"
         ))
     else:
-        print("Belum ada proyek.")
+        print("No projects assigned.")
 
-# Submenu edit karyawan
-def submenu_karyawan(k):
+def employee_submenu(e):
+    """
+    Submenu for updating, deleting, or adding project/performance to employee.
+    """
     while True:
-        print("\n--- SUBMENU KARYAWAN ---")
+        print("\n--- EMPLOYEE SUBMENU ---")
         print("1. Update Data")
-        print("2. Hapus Data")
-        print("3. Tambah Proyek")
-        print("4. Tambah Penilaian Kinerja (+/- Gaji)")
-        print("5. Kembali")
-        pilih = input("Pilih: 1-5 ")
-        if pilih == '1':
-            konfirmasi = input("Anda Yakin Ingin Merubah Data Ini?: (y/n)").upper()
-            if konfirmasi == "Y":
-                k['nama'] = input(f"Nama Baru ({k['nama']}): ") or k['nama']
-                k['posisi'] = input(f"Posisi Baru ({k['posisi']}): ") or k['posisi']
-                gaji_input = input(f"Gaji Baru ({k['gaji']}): ")
-                if gaji_input:
+        print("2. Delete Employee")
+        print("3. Add Project")
+        print("4. Add Performance Grade (+/- Salary)")
+        print("5. Back")
+        choice = input("Select: 1-5 ")
+        if choice == '1':
+            confirm = input("Are you sure you want to update this employee? (y/n): ").upper()
+            if confirm == "Y":
+                e['name'] = input(f"New Name ({e['name']}): ") or e['name']
+                e['position'] = input(f"New Position ({e['position']}): ") or e['position']
+                salary_input = input(f"New Salary ({e['salary']}): ")
+                if salary_input:
                     try:
-                        k['gaji'] = int(gaji_input)
+                        e['salary'] = int(salary_input)
                     except ValueError:
-                        print("❌ Gaji Tidak Valid.")
+                        print("❌ Invalid salary.")
                         continue
-                print("✅ Data Berhasil Diperbarui.")
+                print("✅ Employee data updated.")
             else:
-                print("Update Data Di Cancel.")
-        elif pilih == '2':
-            konfirmasi = input(f"Anda Yakin Ingin Menghapus Data Ini (y/n)?").upper()
-            if konfirmasi == "Y":
-                data_karyawan.remove(k)
-                print("✅ Data Karyawan Dihapus.")
+                print("Update cancelled.")
+        elif choice == '2':
+            confirm = input(f"Are you sure you want to delete this employee? (y/n): ").upper()
+            if confirm == "Y":
+                employee_data.remove(e)
+                print("✅ Employee deleted.")
             else:
-                print("Delete Data Di Cancel")  
+                print("Delete cancelled.")  
             return
-        elif pilih == '3':
-            nama_proyek = input("Nama Proyek: ")
-            peran = input("Peran: ")
-            k['proyek'].append({"nama": nama_proyek, "peran": peran})
-            print("✅ Data Proyek Berhasil Ditambahkan.")
-        elif pilih == '4':
+        elif choice == '3':
+            project_name = input("Project Name: ")
+            role = input("Role: ")
+            e['projects'].append({"name": project_name, "role": role})
+            print("✅ Project data added.")
+        elif choice == '4':
             while True:
-                nilai = input("Masukkan nilai kinerja (A-E): ").upper()
-                if nilai in ['A','B','C','D','E']:
-                    perubahan = nilai_ke_gaji(nilai)
+                grade = input("Enter performance grade (A-E): ").upper()
+                if grade in ['A','B','C','D','E']:
+                    adjustment = grade_to_salary_adjustment(grade)
                     break
                 else:
-                    print("Nilai Tidak Valid! Hanya Dengan Huruf A → E")
-            if perubahan is not None:
-                gaji_lama = k['gaji']
-                k['gaji'] = int(gaji_lama * (1 + perubahan))
-                k['nilai_kinerja'] = nilai
-                print(f"✅ Gaji diubah dari Rp{gaji_lama:,} → Rp{k['gaji']:,}")
-        elif pilih == '5':
+                    print("Invalid grade! Use letters A-E only.")
+            if adjustment is not None:
+                previous_salary = e['salary']
+                e['salary'] = int(previous_salary * (1 + adjustment))
+                e['performance_grade'] = grade
+                print(f"✅ Salary updated from Rp{previous_salary:,} → Rp{e['salary']:,}")
+        elif choice == '5':
             return
         else:
-            print("Pilihan tidak valid.")
+            print("Invalid option.")
 
-# Kelola data karyawan
-def kelola_karyawan():
-    if not data_karyawan:
-        print("Belum ada data.")
+def manage_employees():
+    """
+    Main menu for viewing and managing all employee data.
+    """
+    if not employee_data:
+        print("No employee data available.")
         return
-    print("\n[1] Tampilkan Seluruh Data")
-    print("[2] Kelola Data Berdasarkan ID")
-    opsi = input("Pilih opsi: ")
-    if opsi == '1':
-        for k in data_karyawan:
-            tampilkan_detail_karyawan(k)
-    elif opsi == '2':
-        id_ = input("Masukkan ID karyawan: ")
-        for k in data_karyawan:
-            if str(k['id']) == str(id_):
-                tampilkan_detail_karyawan(k)
-                submenu_karyawan(k)
+    print("\n[1] Show All Employees")
+    print("[2] Manage Employee by ID")
+    option = input("Choose an option: ")
+    if option == '1':
+        for e in employee_data:
+            show_employee_details(e)
+    elif option == '2':
+        id_ = input("Enter Employee ID: ")
+        for e in employee_data:
+            if str(e['id']) == str(id_):
+                show_employee_details(e)
+                employee_submenu(e)
                 return
-        print("❌ Karyawan tidak ditemukan.")
+        print("❌ Employee not found.")
     else:
-        print("❌ Pilihan tidak valid.")
+        print("❌ Invalid option.")
 
-# Tambah absensi
-def tambah_kehadiran():
-    print("\n[Tambah Kehadiran Hari Ini]")
-    id_ = input("Masukkan ID Karyawan: ")
-    for k in data_karyawan:
-        if str(k['id']) == str(id_):
+def add_attendance():
+    """
+    Add today's attendance status for an employee.
+    """
+    print("\n[Add Today's Attendance]")
+    id_ = input("Enter Employee ID: ")
+    for e in employee_data:
+        if str(e['id']) == str(id_):
             while True:
-                kehadiran = input("Kehadiran Karyawan (Hadir/Tidak): ").title().strip()
-                if kehadiran in ["Hadir", "Tidak"]:
-                    k['kehadiran'] = kehadiran
-                    k['riwayat_kehadiran'].append({
-                        "tanggal": datetime.today().strftime("%Y-%m-%d"),
-                        "status": kehadiran
+                attendance = input("Attendance (Present/Absent): ").title().strip()
+                if attendance in ["Present", "Absent"]:
+                    e['attendance'] = attendance
+                    e['attendance_history'].append({
+                        "date": datetime.today().strftime("%Y-%m-%d"),
+                        "status": attendance
                     })
-                    print("✅ Kehadiran ditambahkan.")
+                    print("✅ Attendance recorded.")
                     return
                 else:
-                    print("❌ Validasi hanya dengan kata 'Hadir' atau 'Tidak'.")
-    print("❌ Karyawan tidak ditemukan.")
+                    print("❌ Only use 'Present' or 'Absent'.")
+    print("❌ Employee not found.")
 
-# Cari data
-# Menu untuk menampilkan data yang dicari dengan ID atau nama.
-def cari_data():
-    keyword = input("Masukkan Nama atau ID Yang Ingin Dicari: ").strip().lower()
-    hasil = [] # buat variable kosong untuk diisi dengan data yang dicari
-    for k in data_karyawan:
-        if keyword in str(k['id']).lower() or keyword in k['nama'].lower():
-            hasil.append(k)# mencari keyword didalam 'id' dan 'nama' dengan 'in',misal huruf depan doang
-    if hasil:
-        print(f"\nDitemukan {len(hasil)} data:")
-        for k in hasil:#kalau karakter ada kecenderungan dengan nama atau id, maka data utuh ditampilkan
-            tampilkan_detail_karyawan(k)
+def search_employee():
+    """
+    Search employees by name or ID (partial match).
+    """
+    keyword = input("Enter name or ID to search: ").strip().lower()
+    results = []
+    for e in employee_data:
+        if keyword in str(e['id']).lower() or keyword in e['name'].lower():
+            results.append(e)
+    if results:
+        print(f"\nFound {len(results)} result(s):")
+        for e in results:
+            show_employee_details(e)
     else:
-        print("❌ Data tidak ditemukan.")
+        print("❌ No matching employee found.")
 
-# Menu utama
-def menu():
+def main_menu():
+    """
+    The main menu loop for the employee management application.
+    """
     while True:
-        print("\n=== MENU UTAMA ===")
-        print("1. Tambah Karyawan")
-        print("2. Lihat & Kelola Data Karyawan")
-        print("3. Absensi")
-        print("4. Cari Data Karyawan")
-        print("5. Keluar")
-        pilih = input("Pilih (1-5): ")
-        if pilih == '1':
-            create_karyawan()
-        elif pilih == '2':
-            kelola_karyawan()
-        elif pilih == '3':
-            tambah_kehadiran()
-        elif pilih == '4':
-            cari_data()
-        elif pilih == '5':
-            print(" Keluar dari program.")
+        print("\n=== MAIN MENU ===")
+        print("1. Add Employee")
+        print("2. View & Manage Employees")
+        print("3. Attendance")
+        print("4. Search Employee")
+        print("5. Exit")
+        choice = input("Choose (1-5): ")
+        if choice == '1':
+            create_employee()
+        elif choice == '2':
+            manage_employees()
+        elif choice == '3':
+            add_attendance()
+        elif choice == '4':
+            search_employee()
+        elif choice == '5':
+            print("Exiting program.")
             break
         else:
-            print("Pilihan tidak valid.")
+            print("Invalid choice.")
 
-# Jalankan menu
-menu()
+# Run the application
+main_menu()
+
 
